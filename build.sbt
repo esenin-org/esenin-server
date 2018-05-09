@@ -25,7 +25,8 @@ lazy val server = (project in file("server"))
     commonSettings,
     name := "esenin-server",
     libraryDependencies ++= Seq(
-      "com.spotify" % "docker-client" % "8.11.1"
+      "com.spotify" % "docker-client" % "8.11.1",
+      "org.slf4j" % "slf4j-simple" % "1.7.5"
     ),
     mainClass in assembly := Some("com.vovapolu.esenin.server.EseninServerMain"),
     test in assembly := {}

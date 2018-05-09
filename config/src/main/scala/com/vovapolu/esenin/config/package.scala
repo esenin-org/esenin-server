@@ -17,8 +17,8 @@ package object config {
 
   import ConfigConverters._
 
-  def loadModules(path: Path): Either[ConfigReaderFailures, ModulesConfig] = {
-    pureconfig.loadConfig[ModulesConfig](ConfigFactory.parseFile(path.toFile))
+  def loadModules(path: Path): Either[List[String], ModulesConfig] = {
+    pureconfig.loadConfig[ModulesConfig](ConfigFactory.parseFile(path.toFile)).left.map(_.toList.map(_.description))
   }
   def saveContainers(config: ContainersConfig, path: Path): Either[Throwable, Unit] = {
     Try { pureconfig.saveConfigAsPropertyFile(ConfigWriter[ContainersConfig].to(config), path) }.toEither

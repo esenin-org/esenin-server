@@ -7,7 +7,7 @@ import org.http4s.{EntityDecoder, EntityEncoder}
 import org.http4s.circe._
 
 object Responses {
-  implicit val config: Configuration =
+  implicit val circleConfig: Configuration =
     Configuration.default.withSnakeCaseMemberNames
 
   @ConfiguredJsonCodec final case class PosPart(word: String,

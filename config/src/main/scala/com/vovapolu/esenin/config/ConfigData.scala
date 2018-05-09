@@ -16,7 +16,9 @@ final case class DockerHubSource(image: String) extends ModuleSource {
   require(!image.contains(":"), "image shouldn't contain colon")
 }
 
-final case class ModuleConfig(name: String, nlpFunc: NlpFunc, source: ModuleSource)
+final case class ModuleConfig(name: String,
+                              nlpFunc: NlpFunc,
+                              source: ModuleSource)
 final case class ModulesConfig(modules: Seq[ModuleConfig])
 final case class ContainerConfig(module: ModuleConfig)
 final case class ContainersConfig(containers: Seq[ContainerConfig])
@@ -24,7 +26,8 @@ final case class ContainersConfig(containers: Seq[ContainerConfig])
 object ConfigConverters {
   implicit val nlpFuncHint = new EnumCoproductHint[NlpFunc]
 
-  implicit val moduleSourceReader = ConfigReader[String].emap(
+  implicit val moduleSourceReader
+    : ConfigReader[ModuleSource] = ConfigReader[String].emap(
     s => {
       val parts = s.split(':')
       if (parts.length != 2) {
@@ -32,13 +35,16 @@ object ConfigConverters {
       } else {
         parts(0) match {
           case "dockerhub" => Right(DockerHubSource(parts(1)))
-          case _ => Left(CannotConvert(s, "ModuleSource", s"Unknown source: ${parts(0)}"))
+          case _ =>
+            Left(
+              CannotConvert(s, "ModuleSource", s"Unknown source: ${parts(0)}"))
         }
       }
     }
   )
 
-  implicit val moduleSourceWriter = ConfigWriter[String].contramap[ModuleSource] {
-    case DockerHubSource(name) => s"dockerhub:$name"
-  }
+  implicit val moduleSourceWriter: ConfigWriter[ModuleSource] =
+    ConfigWriter[String].contramap[ModuleSource] {
+      case DockerHubSource(name) => s"dockerhub:$name"
+    }
 }

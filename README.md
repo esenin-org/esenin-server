@@ -23,12 +23,16 @@ Download [the latest release](https://github.com/esenin-org/esenin-server/releas
 
 Create file `modules.conf` next to the downloaded archive. 
 Take a look at [example of configuration](https://github.com/esenin-org/esenin-server/blob/master/modules.conf)
-or [Configuration](#Configuration) section
+or [Configuration](#configuration) section
 and specify the necessary modules in your config. 
 
 ##### Step 3
 
 Run the application: `java -jar <downloaded_archive>`.
+
+##### Step 4
+
+Connect to the `esenin-server` via [wrapper for chosen programming language or manually](#usage). 
 
 ### Configuration
 
@@ -61,7 +65,7 @@ It uses `esenin/syntaxnet` dockerhub image. It implements the `pos` function.
 ### Usage
 
 While running `esenin-server` can accept HTTP-requests on `/nlp/<nlp-func>` addresses.
-Each function has its own json request format which are described in [NLP functions section](#NLP-functions).
+Each function has its own json request format which are described in [NLP functions section](#nlp-functions).
 
 But it's more preferably to use special wrappers for various programming languages:
 - [`esenin-python`](https://github.com/esenin-org/esenin-python) for Python.  
@@ -76,7 +80,6 @@ Example request:
 {
   "string": "Мама мыла раму."
 }
-
 ``` 
 Example response: 
 ```json

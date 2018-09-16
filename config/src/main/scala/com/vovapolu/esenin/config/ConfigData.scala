@@ -8,7 +8,10 @@ sealed trait NlpFunc {
   def name: String
 }
 case object POS extends NlpFunc {
-  override val name: String = "POS"
+  val name = "POS"
+}
+case object TM extends NlpFunc {
+  val name = "TM"
 }
 
 sealed trait ModuleSource

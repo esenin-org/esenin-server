@@ -3,12 +3,15 @@ package server
 
 import java.nio.file.Paths
 
-import com.spotify.docker.client.DefaultDockerClient
+import com.spotify.docker.client.{DefaultDockerClient, DockerClient}
 import com.spotify.docker.client.messages.HostConfig.Bind
 import com.spotify.docker.client.messages._
 
 import scala.collection.JavaConverters._
+import scala.concurrent.{Await, Future}
 import scala.util.Try
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
 
 object EseninServerMain extends App {
 
@@ -21,6 +24,25 @@ object EseninServerMain extends App {
           .image(s"$image:latest")
           .build()
     }
+  }
+
+  def monitorContainers(docker: DockerClient,
+                        ids: Seq[String]): Either[String, Unit] = {
+    ids.map { id =>
+      val info = docker.inspectContainer(id)
+      if (!info.state().running()) {
+        if (info.state().exitCode() == 0) {
+          docker.restartContainer(id)
+          None
+        } else {
+          Some(s"Error in $id container: ${info.state().error()}")
+        }
+      } else {
+        None
+      }
+    }.collectFirst {
+      case Some(err) => err
+    }.toLeft(())
   }
 
   val proxyContainer = {
@@ -63,8 +85,9 @@ object EseninServerMain extends App {
     containers = ("proxy" -> proxyContainer) +:
       modulesConfig.modules.map(m => m.name -> toDockerContainer(m))
     creations <- Try {
-      println(s"Creating containers: ${containers.map(_._2.image).mkString(", ")}")
-      containers.map { case (name, c)  => docker.createContainer(c, name) }
+      println(
+        s"Creating containers: ${containers.map(_._2.image).mkString(", ")}")
+      containers.map { case (name, c) => docker.createContainer(c, name) }
     }.toEither
     _ <- Try {
       println("Connecting containers to the network...")
@@ -74,9 +97,21 @@ object EseninServerMain extends App {
       println("Starting containers...")
       creations.foreach(c => docker.startContainer(c.id))
     }.toEither
-    _ <- Try {
-      println("Press any key to stop esenin server.")
-      scala.io.StdIn.readLine()
+    _ <- {
+      val monitor = Future {
+        var res: Either[String, Unit] = Right(())
+        while (res.isRight) { // TODO looks hacky
+          Thread.sleep(1000) // TODO looks hacky
+          res = monitorContainers(docker, creations.map(_.id))
+        }
+        res
+      }
+      val pressEnter = Future {
+        println("Press any key to stop esenin server.")
+        scala.io.StdIn.readLine()
+      }.map(_ => Right(()))
+      val res = Await.result(Future.firstCompletedOf(Seq(monitor, pressEnter)), Duration.Inf)
+      res.left.map(new RuntimeException(_)).toTry
     }.toEither
     _ <- Try {
       println("Killing containers...")

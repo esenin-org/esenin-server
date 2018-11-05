@@ -51,6 +51,11 @@ Example:
       nlp-func = "pos"
       source = "dockerhub:esenin/syntaxnet"
     }
+    {
+      name = "big-artm"
+      nlp-func = "tm"
+      source = "dockerhub:esenin/bigartm"
+    }
   ]
 }
 ```
@@ -59,7 +64,9 @@ Example:
 
 Currently supported tools:
 - [SyntaxNet](https://github.com/tensorflow/models/tree/master/research/syntaxnet). 
-It uses `esenin/syntaxnet` dockerhub image. It implements the `pos` function. 
+It uses `esenin/syntaxnet` dockerhub image, sources of this image can be found [here](https://github.com/esenin-org/esenin-syntaxnet). It implements the `pos` function. 
+- [BigArtm](https://github.com/bigartm/bigartm).
+It uses `esenin/bigartm` dockerhub image, sources of this image can be found [here](https://github.com/esenin-org/esenin-bigartm). It implements the `tm` function.
 
 
 ### Usage
@@ -73,7 +80,7 @@ But it's more preferably to use special wrappers for various programming languag
 ### NLP functions
 
 ##### `pos`
-It takes arbitrary _russian_ text and returns Part Of Speech tags. 
+Takes arbitrary _russian_ text and returns Part Of Speech tags.
 
 Example request: 
 ```json
@@ -121,4 +128,40 @@ Example response:
   ]
 }
 ```
+
+#### `tm`
+
+This function consists of two requests:
+ - Fit request that trains topic modeling algorithm. 
+ - Topics request that returns probability of each topic for the given term.
+ 
+Example `fit` request:
+```json
+{
+  "terms": [["Мама", "мыла", "раму"], ["Мама", "мыла", "окно"], ["Мама", "мыла", "пол"]],
+  "topics": 10
+}
+```  
+Example `fit` response:
+```json
+{
+  "id": "754b4def-0c2d-4a64-a7d8-4bedd9626471"
+}
+```
+
+Example `topics` request:
+```json
+{
+  "id": "754b4def-0c2d-4a64-a7d8-4bedd9626471",
+  "term": "Мама"
+}
+```
+
+Example `topics` response:
+```json
+{"topics": [0.01, 0.04, 0.03, 0.03, 0.03, 0.03, 0.01, 0.006, 0.02, 0.001]}
+```
+
+
+
 

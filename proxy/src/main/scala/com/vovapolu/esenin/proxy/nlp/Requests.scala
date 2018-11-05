@@ -14,6 +14,6 @@ object Requests {
     jsonOf[IO, PosRequest]
   implicit val tmFitRequestDecoder: EntityDecoder[IO, TmFitRequest] =
     jsonOf[IO, TmFitRequest]
-  implicit val tmTopocsRequestDecoder: EntityDecoder[IO, TmTopicsRequest] =
+  implicit val tmTopicsRequestDecoder: EntityDecoder[IO, TmTopicsRequest] =
     jsonOf[IO, TmTopicsRequest]
 }

@@ -132,9 +132,14 @@ Example response:
 #### `tm`
 
 This function consists of two requests:
- - Fit request that trains topic modeling algorithm. 
- - Topics request that returns probability of each topic for the given term.
- 
+ - `fit` request that trains topic modeling algorithm.
+   - It takes list of documents, where document is a list of terms, and number of topics. 
+   - Trains topic modeling algorithm with given terms and number of topics.
+   - Returns the id of trained model, it's used in `topics` request.
+ - `topics` request that returns probability of each topic to be in each term
+   - It takes id of trained topic model and a term.
+   - Returns probabilities of a term to be in each topic.
+
 Example `fit` request:
 ```json
 {
@@ -159,7 +164,7 @@ Example `topics` request:
 
 Example `topics` response:
 ```json
-{"topics": [0.01, 0.04, 0.03, 0.03, 0.03, 0.03, 0.01, 0.006, 0.02, 0.001]}
+{"topics": [0.04, 0.2, 0.15, 0.12, 0.15, 0.16, 0.05, 0.03, 0.1, 0.004]}
 ```
 
 

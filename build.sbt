@@ -5,7 +5,7 @@ val CircleVersion = "0.9.1"
 
 lazy val commonSettings = Seq(
   organization := "com.vovapolu",
-  version := "0.0.2",
+  version := "0.1.0",
   scalaVersion := "2.12.4"
 )
 

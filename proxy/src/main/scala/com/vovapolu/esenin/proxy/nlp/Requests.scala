@@ -6,7 +6,7 @@ import org.http4s.EntityDecoder
 import org.http4s.circe._
 
 object Requests {
-  final case class PosRequest(string: String)
+  final case class PosRequest(text: String)
   final case class TmFitRequest(terms: Seq[Seq[String]], topics: Int)
   final case class TmTopicsRequest(term: String, id: String)
 

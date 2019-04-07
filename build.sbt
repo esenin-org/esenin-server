@@ -27,6 +27,7 @@ lazy val server = (project in file("server"))
       "com.spotify" % "docker-client" % "8.11.1",
       "org.slf4j" % "slf4j-simple" % "1.7.5"
     ),
+    assemblyJarName in assembly := s"esenin-server-${version.value}.jar",
     mainClass in assembly := Some("com.vovapolu.esenin.server.EseninServerMain"),
     test in assembly := {}
   )

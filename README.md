@@ -5,7 +5,7 @@ Each tool is placed in separate _docker_ container, which doesn't depend on the 
 and is only able to receive requests and return the results of text processing. 
 All containers are handled by a centralized server, which also can handle the user HTTP requests. 
 Each containers can be configured and don't need to be installed manually, 
-user specify necessary containers and their configurations at one global config.
+user specify necessary containers and their configurations in one global config.
 
 ### Installation
 
@@ -39,7 +39,7 @@ Connect to the `esenin-server` via [wrapper for chosen programming language or m
 Config is written in [HOCON](https://github.com/lightbend/config/blob/master/HOCON.md). 
 It should contain one array called `modules`, where each module has `name`, `nlp-func` and `source` fields:
 - `name` is an arbitrary string and it is used to locate the container.  
-- `nlp-func` indicates what NLP function is implement by this module.
+- `nlp-func` indicates what NLP function is implemented by this module.
 - `source` specifies location of the image for `docker` container. Only `dockerhub` is supported for now. 
 
 Example:
@@ -71,11 +71,12 @@ It uses `esenin/bigartm` dockerhub image, sources of this image can be found [he
 
 ### Usage
 
-While running `esenin-server` can accept HTTP-requests on `/nlp/<nlp-func>` addresses.
-Each function has its own json request format which are described in [NLP functions section](#nlp-functions).
+`esenin-server` accepts HTTP requests on `/nlp/<nlp-func>` endpoints.
+Each function has its own JSON request format which is described in [NLP functions section](#nlp-functions).
 
-But it's more preferably to use special wrappers for various programming languages:
-- [`esenin-python`](https://github.com/esenin-org/esenin-python) for Python.  
+For constructing these JSON requests and parse results it's recommended to use special wrappers for various programming languages:
+- [`esenin-python`](https://github.com/esenin-org/esenin-python) for Python.
+- [`esenin-cpp`](https://github.com/esenin-org/esenin-cpp) for C++.
 
 ### NLP functions
 
@@ -85,45 +86,36 @@ Takes arbitrary _russian_ text and returns Part Of Speech tags.
 Example request: 
 ```json
 {
-  "string": "Мама мыла раму."
+  "text": "Мама мыла раму."
 }
 ``` 
 Example response: 
 ```json
 {
-  "input":"Мама мыла раму.",
-  "output":[
+  "words": [
     {
-      "word":"Мама",
-      "label":"nsubj",
-      "break_level":0,
-      "category":"",
-      "head":1,
-      "tag":"attribute { name: \"Animacy\" value: \"Anim\" } attribute { name: \"Case\" value: \"Nom\" } attribute { name: \"Gender\" value: \"Fem\" } attribute { name: \"Number\" value: \"Sing\" } attribute { name: \"fPOS\" value: \"NOUN++\" } "
+      "word": "Мама",
+      "connection_label": "nsubj",    
+      "connection_index": 1,
+      "pos": "NOUN++"
     },
     {
-      "word":"мыла",
-      "label":"root",
-      "break_level":1,
-      "category":"",
-      "head":-1,
-      "tag":"attribute { name: \"Aspect\" value: \"Imp\" } attribute { name: \"Gender\" value: \"Fem\" } attribute { name: \"Mood\" value: \"Ind\" } attribute { name: \"Number\" value: \"Sing\" } attribute { name: \"Tense\" value: \"Past\" } attribute { name: \"VerbForm\" value: \"Fin\" } attribute { name: \"Voice\" value: \"Act\" } attribute { name: \"fPOS\" value: \"VERB++\" } "
+      "word": "мыла",
+      "connection_label": "root",
+      "connection_index": -1,
+      "pos": "VERB++"
     },
     {
-      "word":"раму",
-      "label":"obj",
-      "break_level":1,
-      "category":"",
-      "head":1,
-      "tag":"attribute { name: \"Animacy\" value: \"Inan\" } attribute { name: \"Case\" value: \"Acc\" } attribute { name: \"Gender\" value: \"Fem\" } attribute { name: \"Number\" value: \"Sing\" } attribute { name: \"fPOS\" value: \"NOUN++\" } "
+      "word": "раму",
+      "connection_label": "obj",
+      "connection_index": 1,
+      "pos": "NOUN++"
     },
     {
-      "word":".",
-      "label":"punct",
-      "break_level":0,
-      "category":"",
-      "head":2,
-      "tag":"attribute { name: \"fPOS\" value: \"PUNCT++\" } "
+      "word": ".",
+      "connection_label": "punct",
+      "connection_index": 2,
+      "pos": "PUNCT++"
     }
   ]
 }

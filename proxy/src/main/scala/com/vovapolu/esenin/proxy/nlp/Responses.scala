@@ -10,14 +10,25 @@ object Responses {
   implicit val circleConfig: Configuration =
     Configuration.default.withSnakeCaseMemberNames
 
-  final case class PosWord(word: String,
-                           connection_label: String,
-                           connection_index: Int,
-                           pos: String)
+  final case class DependencyTreeNode(label: String, parent: Int)
 
-  final case class PosResponse(words: Seq[PosWord])
+  final case class TokenizeResponse(tokens: List[String])
+  final case class DependencyTreeResponse(nodes: List[DependencyTreeNode])
+  final case class PosResponse(pos: List[String])
   final case class TmFitResponse(id: String)
-  final case class TmTopicsResponse(topics: Seq[Double])
+  final case class TmTopicsResponse(topics: List[Double])
+
+  implicit val tokenizeResponseEncoder: EntityEncoder[IO, TokenizeResponse] =
+    jsonEncoderOf[IO, TokenizeResponse]
+  implicit val tokenizeResponseDecoder: EntityDecoder[IO, TokenizeResponse] =
+    jsonOf[IO, TokenizeResponse]
+
+  implicit val dependencyTreeResponseEncoder
+    : EntityEncoder[IO, DependencyTreeResponse] =
+    jsonEncoderOf[IO, DependencyTreeResponse]
+  implicit val dependencyTreeResponseDecoder
+    : EntityDecoder[IO, DependencyTreeResponse] =
+    jsonOf[IO, DependencyTreeResponse]
 
   implicit val posResponseEncoder: EntityEncoder[IO, PosResponse] =
     jsonEncoderOf[IO, PosResponse]

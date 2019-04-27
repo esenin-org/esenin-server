@@ -26,23 +26,25 @@ object EseninServerMain extends App {
     }
   }
 
-  def monitorContainers(docker: DockerClient,
-                        ids: Seq[String]): Either[String, Unit] = {
-    ids.map { id =>
-      val info = docker.inspectContainer(id)
-      if (!info.state().running()) {
-        if (info.state().exitCode() == 0) {
-          docker.restartContainer(id)
-          None
+  def monitorContainers(docker: DockerClient, ids: Seq[String]): Either[String, Unit] = {
+    ids
+      .map { id =>
+        val info = docker.inspectContainer(id)
+        if (!info.state().running()) {
+          if (info.state().exitCode() == 0) {
+            docker.restartContainer(id)
+            None
+          } else {
+            Some(s"Error in $id container: ${info.state().error()}")
+          }
         } else {
-          Some(s"Error in $id container: ${info.state().error()}")
+          None
         }
-      } else {
-        None
       }
-    }.collectFirst {
-      case Some(err) => err
-    }.toLeft(())
+      .collectFirst {
+        case Some(err) => err
+      }
+      .toLeft(())
   }
 
   val proxyContainer = {
@@ -50,8 +52,7 @@ object EseninServerMain extends App {
 
     val hostConfig =
       HostConfig.builder
-        .portBindings(
-          Map(port -> List(PortBinding.of("0.0.0.0", port)).asJava).asJava)
+        .portBindings(Map(port -> List(PortBinding.of("0.0.0.0", port)).asJava).asJava)
         .appendBinds(
           Bind
             .from(configPath.toAbsolutePath.toString)
@@ -82,12 +83,11 @@ object EseninServerMain extends App {
         .foreach(n => docker.removeNetwork(n.id))
       docker.createNetwork(NetworkConfig.builder().name("esenin-net").build())
     }.toEither
-    containers = ("proxy" -> proxyContainer) +:
-      modulesConfig.modules.map(m => m.name -> toDockerContainer(m))
+    containers = (("proxy" -> proxyContainer) +:
+      modulesConfig.modules.map(m => m.name -> toDockerContainer(m))).toMap
     creations <- Try {
-      println(
-        s"Creating containers: ${containers.map(_._2.image).mkString(", ")}")
-      containers.map { case (name, c) => docker.createContainer(c, name) }
+      println(s"Creating containers: ${containers.values.map(_.image).mkString(", ")}")
+      containers.map { case (name, c) => docker.createContainer(c, name) }.toList
     }.toEither
     _ <- Try {
       println("Connecting containers to the network...")

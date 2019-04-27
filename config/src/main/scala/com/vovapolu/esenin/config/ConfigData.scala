@@ -7,11 +7,17 @@ import pureconfig.error.CannotConvert
 sealed trait NlpFunc {
   def name: String
 }
+case object Token extends NlpFunc {
+  val name = "token"
+}
+case object DTree extends NlpFunc {
+  val name = "dtree"
+}
 case object POS extends NlpFunc {
-  val name = "POS"
+  val name = "pos"
 }
 case object TM extends NlpFunc {
-  val name = "TM"
+  val name = "tm"
 }
 
 sealed trait ModuleSource

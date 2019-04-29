@@ -10,6 +10,9 @@ sealed trait NlpFunc {
 case object Token extends NlpFunc {
   val name = "token"
 }
+case object Sentence extends NlpFunc {
+  val name = "sentence"
+}
 case object DTree extends NlpFunc {
   val name = "dtree"
 }
@@ -18,6 +21,9 @@ case object POS extends NlpFunc {
 }
 case object TM extends NlpFunc {
   val name = "tm"
+}
+case object NE extends NlpFunc {
+  val name = "ne"
 }
 
 sealed trait ModuleSource

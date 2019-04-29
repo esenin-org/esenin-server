@@ -41,8 +41,8 @@ object EseninProxy extends StreamApp[IO] with Http4sDsl[IO] with Http4sClientDsl
             client <- clientIO
             request <- req.as[Req]
             uri <- IO.fromEither(Uri.fromString(s"http://${m.name}:9000/api/$apiMethod"))
-            proxyRequst = POST(uri, request.asJson)
-            posResponse <- client.expect(proxyRequst)(jsonOf[IO, Res])
+            proxyRequest = POST(uri, request.asJson)
+            posResponse <- client.expect(proxyRequest)(jsonOf[IO, Res])
             response <- Ok(posResponse)
           } yield response
         case None => BadRequest("Wrong NLP function")
@@ -52,6 +52,8 @@ object EseninProxy extends StreamApp[IO] with Http4sDsl[IO] with Http4sClientDsl
     HttpService[IO] {
       case req @ POST -> Root / "nlp" / config.Token.name =>
         findAndReroute[TokenizeRequest, TokenizeResponse](req, config.Token, "token")
+      case req @ POST -> Root / "nlp" / config.Sentence.name =>
+        findAndReroute[SentenizeRequest, SentenizeResponse](req, config.Sentence, "sentence")
       case req @ POST -> Root / "nlp" / config.DTree.name =>
         findAndReroute[DependencyTreeRequest, DependencyTreeResponse](req, config.DTree, "dtree")
       case req @ POST -> Root / "nlp" / config.POS.name =>
@@ -60,6 +62,8 @@ object EseninProxy extends StreamApp[IO] with Http4sDsl[IO] with Http4sClientDsl
         findAndReroute[TmFitRequest, TmFitResponse](req, config.TM, "fit")
       case req @ POST -> Root / "nlp" / config.TM.name / "topics" =>
         findAndReroute[TmTopicsRequest, TmTopicsResponse](req, config.TM, "topics")
+      case req @ POST -> Root / "nlp" / config.NE.name =>
+        findAndReroute[NamedEntitiesRequest, NamedEntitiesResponse](req, config.NE, "ne")
     }
   }
 

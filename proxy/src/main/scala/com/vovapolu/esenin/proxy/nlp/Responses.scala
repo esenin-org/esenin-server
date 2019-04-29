@@ -11,10 +11,13 @@ object Responses {
     Configuration.default.withSnakeCaseMemberNames
 
   final case class DependencyTreeNode(label: String, parent: Int)
+  final case class NamedEntity(indexes: List[Int], kind: String)
 
   final case class TokenizeResponse(tokens: List[String])
+  final case class SentenizeResponse(sentences: List[String])
   final case class DependencyTreeResponse(nodes: List[DependencyTreeNode])
   final case class PosResponse(pos: List[String])
+  final case class NamedEntitiesResponse(entities: List[NamedEntity])
   final case class TmFitResponse(id: String)
   final case class TmTopicsResponse(topics: List[Double])
 
@@ -22,6 +25,11 @@ object Responses {
     jsonEncoderOf[IO, TokenizeResponse]
   implicit val tokenizeResponseDecoder: EntityDecoder[IO, TokenizeResponse] =
     jsonOf[IO, TokenizeResponse]
+
+  implicit val sentenizeResponseEncoder: EntityEncoder[IO, SentenizeResponse] =
+    jsonEncoderOf[IO, SentenizeResponse]
+  implicit val sentenizeResponseDecoder: EntityDecoder[IO, SentenizeResponse] =
+    jsonOf[IO, SentenizeResponse]
 
   implicit val dependencyTreeResponseEncoder
     : EntityEncoder[IO, DependencyTreeResponse] =
@@ -34,6 +42,11 @@ object Responses {
     jsonEncoderOf[IO, PosResponse]
   implicit val posResponseDecoder: EntityDecoder[IO, PosResponse] =
     jsonOf[IO, PosResponse]
+
+  implicit val namedEntitiesResponseEncoder: EntityEncoder[IO, NamedEntitiesResponse] =
+    jsonEncoderOf[IO, NamedEntitiesResponse]
+  implicit val namedEntitiesResponseDecoder: EntityDecoder[IO, NamedEntitiesResponse] =
+    jsonOf[IO, NamedEntitiesResponse]
 
   implicit val tmTopicsResponseEncoder: EntityEncoder[IO, TmTopicsResponse] =
     jsonEncoderOf[IO, TmTopicsResponse]
